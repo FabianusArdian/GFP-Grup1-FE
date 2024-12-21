@@ -3,8 +3,6 @@
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { useAccountData } from "@/lib/hooks/use-account-data";
-import { Skeleton } from "@/components/ui/skeleton";
 import {
   Select,
   SelectContent,
@@ -17,32 +15,6 @@ import { OrderList } from "./order-list";
 export function OrderHistory() {
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("all");
-  const { orders, isLoading } = useAccountData();
-
-  if (isLoading) {
-    return (
-      <div className="space-y-8">
-        <Skeleton className="h-8 w-48" />
-        <Card className="p-6">
-          <div className="space-y-4">
-            <div className="flex gap-4">
-              <Skeleton className="h-10 w-64" />
-              <Skeleton className="h-10 w-32" />
-            </div>
-            {[1, 2, 3].map((i) => (
-              <Skeleton key={i} className="h-16 w-full" />
-            ))}
-          </div>
-        </Card>
-      </div>
-    );
-  }
-
-  const filteredOrders = orders.filter(order => {
-    const matchesSearch = order.id.includes(search);
-    const matchesStatus = status === "all" || order.status === status;
-    return matchesSearch && matchesStatus;
-  });
 
   return (
     <div className="space-y-8">
@@ -70,7 +42,7 @@ export function OrderHistory() {
           </Select>
         </div>
 
-        <OrderList orders={filteredOrders} />
+        <OrderList search={search} status={status} />
       </Card>
     </div>
   );

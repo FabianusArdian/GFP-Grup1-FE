@@ -1,17 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
 import { Formik, Form, Field } from "formik";
 import { loginSchema, type LoginFormValues } from "@/lib/validations/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { useToast } from "@/hooks/use-toast";
-import { login } from "@/lib/services/auth";
-import { useUserStore } from "@/lib/stores/user-store";
-import Cookies from 'js-cookie';
-import { AUTH_CONFIG } from "@/lib/config/constants";
 import {
   Select,
   SelectContent,
@@ -19,7 +12,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ro } from "date-fns/locale";
+import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
+import { useRouter } from "next/navigation";
+import { login } from "@/lib/services/auth";
 
 const initialValues: LoginFormValues = {
   email: "",
@@ -31,34 +27,28 @@ export function LoginForm() {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const { handleAuthResponse } = useUserStore();
 
   const handleSubmit = async (values: LoginFormValues) => {
+    setIsLoading(true);
     try {
-      setIsLoading(true);
-      const response = await login(values);
-
-      // // Handle successful login
-      handleAuthResponse(response);
+      const user = await login(values);
 
       toast({
-        title: "Login successful",
-        description: `Welcome back, ${response.user.name}!`,
+        title: "Login berhasil",
+        description: `Selamat datang kembali, ${user.name}!`,
       });
 
-
-      // Get redirect URL from query params or use default based on role
-      const redirect = searchParams.get('redirect') ||
-        (response.user.role === "seller" ? "/dashboard" : "/account");
-
-      router.push(redirect);
-
-    } catch (error: any) {
+      // Redirect based on user role
+      if (user.role === "seller") {
+        router.push("/dashboard");
+      } else {
+        router.push("/account");
+      }
+    } catch (error) {
       toast({
         variant: "destructive",
-        title: "Login failed",
-        description: error.message || "Invalid credentials",
+        title: "Login gagal",
+        description: error instanceof Error ? error.message : "Terjadi kesalahan saat login",
       });
     } finally {
       setIsLoading(false);
@@ -78,10 +68,9 @@ export function LoginForm() {
             <Select
               onValueChange={(value) => setFieldValue("role", value)}
               defaultValue={initialValues.role}
-              disabled={isLoading}
             >
               <SelectTrigger>
-                <SelectValue placeholder="Select role" />
+                <SelectValue placeholder="Pilih role" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="consumer">Consumer</SelectItem>
@@ -99,8 +88,7 @@ export function LoginForm() {
               as={Input}
               name="email"
               type="email"
-              placeholder="Enter your email"
-              disabled={isLoading}
+              placeholder="email@example.com"
             />
             {errors.email && touched.email && (
               <p className="text-sm text-destructive">{errors.email}</p>
@@ -113,8 +101,7 @@ export function LoginForm() {
               as={Input}
               name="password"
               type="password"
-              placeholder="Enter your password"
-              disabled={isLoading}
+              placeholder="********"
             />
             {errors.password && touched.password && (
               <p className="text-sm text-destructive">{errors.password}</p>
@@ -122,7 +109,7 @@ export function LoginForm() {
           </div>
 
           <Button type="submit" className="w-full" disabled={isLoading}>
-            {isLoading ? "Logging in..." : "Login"}
+            {isLoading ? "Loading..." : "Login"}
           </Button>
         </Form>
       )}

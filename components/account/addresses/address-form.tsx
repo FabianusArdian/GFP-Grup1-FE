@@ -6,8 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useToast } from "@/hooks/use-toast";
-import { accountService } from "@/lib/services/account";
 
 const addressSchema = Yup.object().shape({
   label: Yup.string().required("Label is required"),
@@ -25,8 +23,6 @@ interface AddressFormProps {
 }
 
 export function AddressForm({ onSuccess }: AddressFormProps) {
-  const { toast } = useToast();
-
   return (
     <Formik
       initialValues={{
@@ -41,25 +37,13 @@ export function AddressForm({ onSuccess }: AddressFormProps) {
       }}
       validationSchema={addressSchema}
       onSubmit={async (values) => {
-        try {
-          await accountService.addAddress(values);
-          toast({
-            title: "Success",
-            description: "Address added successfully"
-          });
-          onSuccess();
-        } catch (error) {
-          toast({
-            variant: "destructive",
-            title: "Error",
-            description: "Failed to add address"
-          });
-        }
+        // Handle form submission
+        console.log(values);
+        onSuccess();
       }}
     >
       {({ errors, touched }) => (
         <Form className="space-y-4">
-          {/* Form fields remain the same */}
           <div className="space-y-2">
             <Label>Label</Label>
             <Field
@@ -110,7 +94,7 @@ export function AddressForm({ onSuccess }: AddressFormProps) {
             )}
           </div>
 
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>City</Label>
               <Field
@@ -134,18 +118,18 @@ export function AddressForm({ onSuccess }: AddressFormProps) {
                 <p className="text-sm text-destructive">{errors.province}</p>
               )}
             </div>
+          </div>
 
-            <div className="space-y-2">
-              <Label>Postal Code</Label>
-              <Field
-                as={Input}
-                name="postalCode"
-                placeholder="Postal code"
-              />
-              {errors.postalCode && touched.postalCode && (
-                <p className="text-sm text-destructive">{errors.postalCode}</p>
-              )}
-            </div>
+          <div className="space-y-2">
+            <Label>Postal Code</Label>
+            <Field
+              as={Input}
+              name="postalCode"
+              placeholder="Postal code"
+            />
+            {errors.postalCode && touched.postalCode && (
+              <p className="text-sm text-destructive">{errors.postalCode}</p>
+            )}
           </div>
 
           <div className="flex items-center space-x-2">

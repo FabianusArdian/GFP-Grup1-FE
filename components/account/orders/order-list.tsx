@@ -12,20 +12,42 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { formatCurrency } from "@/lib/utils/currency";
 import { format } from "date-fns";
-import type { Order } from "@/lib/types/order";
 
 interface OrderListProps {
-  orders: Order[];
+  search: string;
+  status: string;
 }
 
-export function OrderList({ orders }: OrderListProps) {
-  if (orders.length === 0) {
-    return (
-      <div className="text-center py-8">
-        <p className="text-muted-foreground">No orders found</p>
-      </div>
-    );
-  }
+const orders = [
+  {
+    id: "1",
+    date: new Date("2024-03-20"),
+    total: 250000,
+    status: "delivered",
+    items: 3,
+  },
+  {
+    id: "2",
+    date: new Date("2024-03-18"),
+    total: 175000,
+    status: "processing",
+    items: 2,
+  },
+  {
+    id: "3",
+    date: new Date("2024-03-15"),
+    total: 320000,
+    status: "delivered",
+    items: 4,
+  },
+];
+
+export function OrderList({ search, status }: OrderListProps) {
+  const filteredOrders = orders.filter((order) => {
+    const matchesSearch = order.id.includes(search);
+    const matchesStatus = status === "all" || order.status === status;
+    return matchesSearch && matchesStatus;
+  });
 
   return (
     <Table>
@@ -40,21 +62,15 @@ export function OrderList({ orders }: OrderListProps) {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {orders.map((order) => (
+        {filteredOrders.map((order) => (
           <TableRow key={order.id}>
             <TableCell>#{order.id}</TableCell>
-            <TableCell>{format(new Date(order.createdAt), "dd MMM yyyy")}</TableCell>
-            <TableCell>{order.items.length} items</TableCell>
-            <TableCell>{formatCurrency(order.totalAmount)}</TableCell>
+            <TableCell>{format(order.date, "dd MMM yyyy")}</TableCell>
+            <TableCell>{order.items} items</TableCell>
+            <TableCell>{formatCurrency(order.total)}</TableCell>
             <TableCell>
               <Badge
-                variant={
-                  order.status === "delivered" 
-                    ? "default" 
-                    : order.status === "processing" 
-                      ? "secondary" 
-                      : "outline"
-                }
+                variant={order.status === "delivered" ? "default" : "secondary"}
               >
                 {order.status}
               </Badge>

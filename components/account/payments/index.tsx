@@ -6,8 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { PaymentMethodList } from "./payment-method-list";
 import { PaymentMethodForm } from "./payment-method-form";
-import { useAccountData } from "@/lib/hooks/use-account-data";
-import { Skeleton } from "@/components/ui/skeleton";
 import {
   Dialog,
   DialogContent,
@@ -17,25 +15,6 @@ import {
 
 export function PaymentMethodsPage() {
   const [isAddingPayment, setIsAddingPayment] = useState(false);
-  const { paymentMethods, isLoading } = useAccountData();
-
-  if (isLoading) {
-    return (
-      <div className="space-y-8">
-        <div className="flex items-center justify-between">
-          <Skeleton className="h-8 w-48" />
-          <Skeleton className="h-10 w-32" />
-        </div>
-        <Card className="p-6">
-          <div className="space-y-4">
-            {[1, 2, 3].map((i) => (
-              <Skeleton key={i} className="h-32 w-full" />
-            ))}
-          </div>
-        </Card>
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-8">
@@ -48,7 +27,7 @@ export function PaymentMethodsPage() {
       </div>
 
       <Card className="p-6">
-        <PaymentMethodList paymentMethods={paymentMethods} />
+        <PaymentMethodList />
       </Card>
 
       <Dialog open={isAddingPayment} onOpenChange={setIsAddingPayment}>

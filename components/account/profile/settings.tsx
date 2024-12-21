@@ -1,59 +1,100 @@
-// "use client";
+"use client";
 
-// import { Card } from "@/components/ui/card";
-// import { useAccount } from "@/lib/hooks/use-account";
-// import { ProfileForm } from "./profile-form";
-// import { SecurityForm } from "./security-form";
-// import {
-//   Tabs,
-//   TabsContent,
-//   TabsList,
-//   TabsTrigger,
-// } from "@/components/ui/tabs";
-// import { Skeleton } from "@/components/ui/skeleton";
+import { Formik, Form, Field } from "formik";
+import * as Yup from "yup";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
+import { useUserStore } from "@/lib/stores/user-store";
 
-// export function ProfileSettings() {
-//   const { profile, isLoading, updateProfile } = useAccount();
+const profileSchema = Yup.object().shape({
+  name: Yup.string().required("Name is required"),
+  email: Yup.string().email("Invalid email").required("Email is required"),
+  phone: Yup.string(),
+});
 
-//   if (isLoading) {
-//     return (
-//       <div className="space-y-8">
-//         <Skeleton className="h-8 w-48" />
-//         <Card className="p-6">
-//           <div className="space-y-4">
-//             <Skeleton className="h-10 w-full" />
-//             <Skeleton className="h-10 w-full" />
-//             <Skeleton className="h-10 w-full" />
-//           </div>
-//         </Card>
-//       </div>
-//     );
-//   }
+export function ProfileSettings() {
+  const { currentUser, updateUser } = useUserStore();
+  const { toast } = useToast();
 
-//   if (!profile) return null;
+  if (!currentUser) return null;
 
-//   return (
-//     <div className="space-y-8">
-//       <h1 className="text-3xl font-bold">Profile Settings</h1>
+  return (
+    <div className="space-y-8">
+      <h1 className="text-3xl font-bold">Profile Settings</h1>
 
-//       <Tabs defaultValue="profile">
-//         <TabsList>
-//           <TabsTrigger value="profile">Profile Information</TabsTrigger>
-//           <TabsTrigger value="security">Security</TabsTrigger>
-//         </TabsList>
+      <Card className="p-6">
+        <Formik
+          initialValues={{
+            name: currentUser.name,
+            email: currentUser.email,
+            phone: currentUser.phone || "",
+          }}
+          validationSchema={profileSchema}
+          onSubmit={async (values) => {
+            try {
+              updateUser(currentUser.id, values);
+              toast({
+                title: "Profile updated",
+                description: "Your profile has been updated successfully.",
+              });
+            } catch (error) {
+              toast({
+                variant: "destructive",
+                title: "Error",
+                description: "Failed to update profile. Please try again.",
+              });
+            }
+          }}
+        >
+          {({ errors, touched }) => (
+            <Form className="space-y-6">
+              <div className="space-y-2">
+                <Label>Name</Label>
+                <Field
+                  as={Input}
+                  name="name"
+                  placeholder="Enter your name"
+                />
+                {errors.name && touched.name && (
+                  <p className="text-sm text-destructive">{errors.name}</p>
+                )}
+              </div>
 
-//         <TabsContent value="profile">
-//           <Card className="p-6">
-//             <ProfileForm profile={profile} onSubmit={updateProfile} />
-//           </Card>
-//         </TabsContent>
+              <div className="space-y-2">
+                <Label>Email</Label>
+                <Field
+                  as={Input}
+                  name="email"
+                  type="email"
+                  placeholder="Enter your email"
+                />
+                {errors.email && touched.email && (
+                  <p className="text-sm text-destructive">{errors.email}</p>
+                )}
+              </div>
 
-//         <TabsContent value="security">
-//           <Card className="p-6">
-//             <SecurityForm />
-//           </Card>
-//         </TabsContent>
-//       </Tabs>
-//     </div>
-//   );
-// }
+              <div className="space-y-2">
+                <Label>Phone Number</Label>
+                <Field
+                  as={Input}
+                  name="phone"
+                  placeholder="Enter your phone number"
+                />
+                {errors.phone && touched.phone && (
+                  <p className="text-sm text-destructive">{errors.phone}</p>
+                )}
+              </div>
+
+              <div className="flex justify-end">
+                <Button type="submit">Save Changes</Button>
+              </div>
+            </Form>
+          )}
+        </Formik>
+      </Card>
+    </div>
+  );
+}

@@ -3,40 +3,30 @@
 import { Card } from "@/components/ui/card";
 import { ShoppingBag, Heart, MapPin, CreditCard } from "lucide-react";
 
-interface AccountStatsProps {
-  totalOrders: number;
-  totalAddresses: number;
-  totalPaymentMethods: number;
-}
+const stats = [
+  {
+    title: "Total Orders",
+    value: "12",
+    icon: ShoppingBag,
+  },
+  {
+    title: "Wishlist Items",
+    value: "8",
+    icon: Heart,
+  },
+  {
+    title: "Saved Addresses",
+    value: "2",
+    icon: MapPin,
+  },
+  {
+    title: "Payment Methods",
+    value: "3",
+    icon: CreditCard,
+  },
+];
 
-export function AccountStats({ 
-  totalOrders, 
-  totalAddresses, 
-  totalPaymentMethods 
-}: AccountStatsProps) {
-  const stats = [
-    {
-      title: "Total Orders",
-      value: totalOrders.toString(),
-      icon: ShoppingBag,
-    },
-    {
-      title: "Saved Addresses",
-      value: totalAddresses.toString(),
-      icon: MapPin,
-    },
-    {
-      title: "Payment Methods",
-      value: totalPaymentMethods.toString(),
-      icon: CreditCard,
-    },
-    {
-      title: "Wishlist Items",
-      value: "0", // Will be implemented with wishlist API
-      icon: Heart,
-    },
-  ];
-
+export function AccountStats() {
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
       {stats.map((stat) => (

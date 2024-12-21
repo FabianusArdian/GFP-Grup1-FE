@@ -3,34 +3,23 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Edit2, Trash2, MapPin } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
-import { useAccountData } from "@/lib/hooks/use-account-data";
-import type { Address } from "@/lib/types/address";
 
-interface AddressListProps {
-  addresses: Address[];
-}
+const addresses = [
+  {
+    id: "1",
+    label: "Home",
+    name: "John Doe",
+    phone: "081234567890",
+    address: "Jl. Sudirman No. 123",
+    city: "Jakarta",
+    province: "DKI Jakarta",
+    postalCode: "12345",
+    isDefault: true,
+  },
+  // Add more addresses...
+];
 
-export function AddressList({ addresses }: AddressListProps) {
-  const { deleteAddress } = useAccountData();
-  const { toast } = useToast();
-
-  const handleDelete = async (id: string) => {
-    try {
-      await deleteAddress(id);
-    } catch (error) {
-      console.error('Failed to delete address:', error);
-    }
-  };
-
-  if (addresses.length === 0) {
-    return (
-      <div className="text-center py-8">
-        <p className="text-muted-foreground">No addresses saved yet</p>
-      </div>
-    );
-  }
-
+export function AddressList() {
   return (
     <div className="space-y-4">
       {addresses.map((address) => (
@@ -55,11 +44,10 @@ export function AddressList({ addresses }: AddressListProps) {
             </div>
           </div>
           <div className="flex gap-2">
-            <Button 
-              variant="ghost" 
-              size="icon"
-              onClick={() => handleDelete(address.id)}
-            >
+            <Button variant="ghost" size="icon">
+              <Edit2 className="h-4 w-4" />
+            </Button>
+            <Button variant="ghost" size="icon">
               <Trash2 className="h-4 w-4" />
             </Button>
           </div>

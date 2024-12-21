@@ -1,14 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { Formik, Form, Field } from "formik";
 import { registerSchema, type RegisterFormValues } from "@/lib/validations/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { useToast } from "@/hooks/use-toast";
-import { register } from "@/lib/services/auth";
 import {
   Select,
   SelectContent,
@@ -16,6 +12,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
+import { useRouter } from "next/navigation";
+import { register } from "@/lib/services/auth";
 
 const initialValues: RegisterFormValues = {
   name: "",
@@ -31,22 +31,21 @@ export function RegisterForm() {
   const router = useRouter();
 
   const handleSubmit = async (values: RegisterFormValues) => {
+    setIsLoading(true);
     try {
-      setIsLoading(true);
-      await register(values);
+      const user = await register(values);
 
       toast({
         title: "Registration successful",
-        description: "Please login to continue",
+        description: `Welcome ${user.name}! You can now login to your account.`,
       });
 
-      // Redirect to login page after successful registration
       router.push("/auth/login");
-    } catch (error: any) {
+    } catch (error) {
       toast({
         variant: "destructive",
         title: "Registration failed",
-        description: error.message || "An error occurred",
+        description: error instanceof Error ? error.message : "An error occurred during registration",
       });
     } finally {
       setIsLoading(false);
@@ -67,7 +66,6 @@ export function RegisterForm() {
               as={Input}
               name="name"
               placeholder="Enter your full name"
-              disabled={isLoading}
             />
             {errors.name && touched.name && (
               <p className="text-sm text-destructive">{errors.name}</p>
@@ -81,7 +79,6 @@ export function RegisterForm() {
               name="email"
               type="email"
               placeholder="Enter your email"
-              disabled={isLoading}
             />
             {errors.email && touched.email && (
               <p className="text-sm text-destructive">{errors.email}</p>
@@ -95,7 +92,6 @@ export function RegisterForm() {
               name="password"
               type="password"
               placeholder="Create a password"
-              disabled={isLoading}
             />
             {errors.password && touched.password && (
               <p className="text-sm text-destructive">{errors.password}</p>
@@ -109,7 +105,6 @@ export function RegisterForm() {
               name="confirmPassword"
               type="password"
               placeholder="Confirm your password"
-              disabled={isLoading}
             />
             {errors.confirmPassword && touched.confirmPassword && (
               <p className="text-sm text-destructive">{errors.confirmPassword}</p>
@@ -121,7 +116,6 @@ export function RegisterForm() {
             <Select
               onValueChange={(value) => setFieldValue("role", value)}
               defaultValue={initialValues.role}
-              disabled={isLoading}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Select account type" />

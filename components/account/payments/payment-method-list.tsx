@@ -2,47 +2,21 @@
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Trash2, CreditCard } from "lucide-react";
-import { useAccountData } from "@/lib/hooks/use-account-data";
-import type { PaymentMethod } from "@/lib/types/payment";
+import { Edit2, Trash2, CreditCard } from "lucide-react";
 
-interface PaymentMethodListProps {
-  paymentMethods: PaymentMethod[];
-}
+const paymentMethods = [
+  {
+    id: "1",
+    type: "credit_card",
+    cardNumber: "**** **** **** 1234",
+    expiryDate: "12/25",
+    cardHolder: "John Doe",
+    isDefault: true,
+  },
+  // Add more payment methods...
+];
 
-export function PaymentMethodList({ paymentMethods }: PaymentMethodListProps) {
-  const { deletePaymentMethod } = useAccountData();
-
-  const handleDelete = async (id: string) => {
-    try {
-      await deletePaymentMethod(id);
-    } catch (error) {
-      console.error('Failed to delete payment method:', error);
-    }
-  };
-
-  if (paymentMethods.length === 0) {
-    return (
-      <div className="text-center py-8">
-        <p className="text-muted-foreground">No payment methods saved yet</p>
-      </div>
-    );
-  }
-
-  const formatCardNumber = (method: PaymentMethod) => {
-    if ('lastFourDigits' in method) {
-      return `**** **** **** ${method.lastFourDigits}`;
-    }
-    return '';
-  };
-
-  const formatExpiryDate = (method: PaymentMethod) => {
-    if ('expiryMonth' in method && 'expiryYear' in method) {
-      return `${method.expiryMonth}/${method.expiryYear}`;
-    }
-    return '';
-  };
-
+export function PaymentMethodList() {
   return (
     <div className="space-y-4">
       {paymentMethods.map((method) => (
@@ -54,27 +28,22 @@ export function PaymentMethodList({ paymentMethods }: PaymentMethodListProps) {
             <CreditCard className="h-5 w-5 text-muted-foreground mt-1" />
             <div>
               <div className="flex items-center gap-2 mb-1">
-                <h3 className="font-medium">{formatCardNumber(method)}</h3>
+                <h3 className="font-medium">{method.cardNumber}</h3>
                 {method.isDefault && (
                   <Badge variant="secondary">Default</Badge>
                 )}
               </div>
-              {'cardholderName' in method && (
-                <p className="text-sm">{method.cardholderName}</p>
-              )}
-              {'expiryMonth' in method && (
-                <p className="text-sm text-muted-foreground">
-                  Expires {formatExpiryDate(method)}
-                </p>
-              )}
+              <p className="text-sm">{method.cardHolder}</p>
+              <p className="text-sm text-muted-foreground">
+                Expires {method.expiryDate}
+              </p>
             </div>
           </div>
           <div className="flex gap-2">
-            <Button 
-              variant="ghost" 
-              size="icon"
-              onClick={() => handleDelete(method.id)}
-            >
+            <Button variant="ghost" size="icon">
+              <Edit2 className="h-4 w-4" />
+            </Button>
+            <Button variant="ghost" size="icon">
               <Trash2 className="h-4 w-4" />
             </Button>
           </div>
