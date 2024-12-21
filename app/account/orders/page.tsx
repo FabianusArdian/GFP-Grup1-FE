@@ -1,4 +1,4 @@
-import { OrderHistory } from "@/components/account/orders/history";
+import { OrderHistory } from "@/components/dashboard/customer/orders/history";
 
 export default function OrdersPage() {
   return <OrderHistory />;

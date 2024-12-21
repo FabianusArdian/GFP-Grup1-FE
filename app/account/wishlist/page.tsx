@@ -1,5 +1,5 @@
-import { ProfileSettings } from "@/components/account/profile/settings";
+import { WishlistPage } from "@/components/dashboard/customer/wishlist";
 
-export default function ProfilePage() {
-  return <ProfileSettings />;
+export default function AccountWishlistPage() {
+  return <WishlistPage />;
 }
