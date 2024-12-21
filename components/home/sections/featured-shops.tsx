@@ -4,36 +4,12 @@ import { useRouter } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Store, Star, MapPin, Award } from "lucide-react";
-import type { Seller } from "@/lib/types/seller";
+import { getTopRatedSellers } from "@/lib/utils/seller";
 
-interface FeaturedShopsProps {
-  sellers?: Seller[];
-  isLoading: boolean;
-}
-
-export function FeaturedShops({ sellers = [], isLoading }: FeaturedShopsProps) {
+export function FeaturedShops() {
   const router = useRouter();
-
-  if (isLoading) {
-    return (
-      <section>
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <Skeleton className="h-8 w-48" />
-            <Skeleton className="h-4 w-96 mt-2" />
-          </div>
-          <Skeleton className="h-10 w-32" />
-        </div>
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {[1, 2, 3].map((i) => (
-            <Skeleton key={i} className="h-[400px] w-full" />
-          ))}
-        </div>
-      </section>
-    );
-  }
+  const featuredShops = getTopRatedSellers();
 
   return (
     <section>
@@ -49,7 +25,7 @@ export function FeaturedShops({ sellers = [], isLoading }: FeaturedShopsProps) {
         </Button>
       </div>
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {sellers.map((shop) => (
+        {featuredShops.map((shop) => (
           <Card key={shop.id} className="group overflow-hidden">
             <div
               className="h-48 w-full transition-transform group-hover:scale-105"
@@ -80,7 +56,7 @@ export function FeaturedShops({ sellers = [], isLoading }: FeaturedShopsProps) {
                 </div>
               </div>
               <div className="flex flex-wrap gap-2 mb-4">
-                {shop.badges && Array.isArray(shop.badges) && shop.badges.map((badge) => (
+                {shop.badges.map((badge) => (
                   <Badge key={badge} variant="outline" className="flex items-center gap-1">
                     <Award className="h-3 w-3" />
                     {badge}

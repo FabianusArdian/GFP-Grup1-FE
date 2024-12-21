@@ -1,10 +1,9 @@
-"use client";
-
 import { Store, MapPin, Star, Award } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import type { Seller } from "@/lib/types/seller";
-import { formatDistanceToNow, parseISO } from "date-fns";
+import type { Seller } from "@/lib/data/server/types/seller";
+import { getSellerRating, getSellerBadgeColor } from "@/lib/utils/seller";
+import { formatDistanceToNow } from "date-fns";
 import { id } from "date-fns/locale";
 
 interface SellerHeaderProps {
@@ -12,9 +11,6 @@ interface SellerHeaderProps {
 }
 
 export function SellerHeader({ seller }: SellerHeaderProps) {
-  // Safely parse the ISO date string
-  const joinedDate = seller.joinedDate ? parseISO(seller.joinedDate) : new Date();
-
   return (
     <Card className="mb-8 p-6">
       <div className="flex items-start gap-6">
@@ -28,7 +24,7 @@ export function SellerHeader({ seller }: SellerHeaderProps) {
             <h1 className="text-2xl font-bold">{seller.name}</h1>
             <Badge variant="secondary" className="flex items-center gap-1">
               <Star className="h-3 w-3 fill-current" />
-              {seller.rating.toFixed(1)}
+              {getSellerRating(seller)}
             </Badge>
           </div>
           
@@ -47,29 +43,22 @@ export function SellerHeader({ seller }: SellerHeaderProps) {
             
             <div className="flex items-center gap-2 text-muted-foreground">
               <Star className="h-4 w-4" />
-              <span>
-                Bergabung {formatDistanceToNow(joinedDate, { 
-                  locale: id,
-                  addSuffix: true 
-                })}
-              </span>
+              <span>Bergabung {formatDistanceToNow(seller.joinedDate, { locale: id })} yang lalu</span>
             </div>
           </div>
 
-          {seller.badges && seller.badges.length > 0 && (
-            <div className="flex flex-wrap gap-2 mt-4">
-              {seller.badges.map((badge) => (
-                <Badge 
-                  key={badge} 
-                  variant="outline" 
-                  className="flex items-center gap-1"
-                >
-                  <Award className="h-3 w-3" />
-                  {badge}
-                </Badge>
-              ))}
-            </div>
-          )}
+          <div className="flex flex-wrap gap-2 mt-4">
+            {seller.badges.map((badge) => (
+              <Badge 
+                key={badge} 
+                variant="outline" 
+                className="flex items-center gap-1"
+              >
+                <Award className="h-3 w-3" />
+                {badge}
+              </Badge>
+            ))}
+          </div>
         </div>
       </div>
     </Card>

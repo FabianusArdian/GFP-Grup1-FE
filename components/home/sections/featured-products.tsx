@@ -1,52 +1,14 @@
 "use client";
 
-import { useState, useEffect } from 'react';
 import { useRouter } from "next/navigation";
+import { products } from "@/lib/data/client/products";
 import { ProductCard } from "@/components/products/product-card";
 import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
-import { productService } from "@/lib/services/products";
-import type { Product } from "@/lib/types/product";
+import { getTopRatedProducts } from "@/lib/utils/product";
 
 export function FeaturedProducts() {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
-
-  useEffect(() => {
-    const fetchFeaturedProducts = async () => {
-      try {
-        setIsLoading(true);
-        const data = await productService.getProducts({ featured: 'true' });
-        setProducts(data);
-      } catch (error) {
-        console.error('Failed to fetch featured products:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchFeaturedProducts();
-  }, []);
-
-  if (isLoading) {
-    return (
-      <section>
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <Skeleton className="h-8 w-48" />
-            <Skeleton className="h-4 w-96 mt-2" />
-          </div>
-          <Skeleton className="h-10 w-32" />
-        </div>
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {[1, 2, 3].map((i) => (
-            <Skeleton key={i} className="h-[400px] w-full" />
-          ))}
-        </div>
-      </section>
-    );
-  }
+  const featuredProducts = getTopRatedProducts(products);
 
   return (
     <section>
@@ -62,7 +24,7 @@ export function FeaturedProducts() {
         </Button>
       </div>
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {products.map((product) => (
+        {featuredProducts.map((product) => (
           <ProductCard key={product.id} product={product} />
         ))}
       </div>

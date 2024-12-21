@@ -1,11 +1,5 @@
-
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useToast } from "@/hooks/use-toast";
-import { logout } from "@/lib/services/auth/logout";
-import { useUserStore } from "@/lib/stores/user-store";
-import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,43 +9,31 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
 import { User, LogOut, Settings } from "lucide-react";
 import { AuthButtons } from "./auth-buttons";
+import { useUserStore } from "@/lib/stores/user-store";
+import { useRouter } from "next/navigation";
+import { logout } from "@/lib/services/auth";
+import { useToast } from "@/hooks/use-toast";
 
 export function UserNav() {
+  const { currentUser } = useUserStore();
   const router = useRouter();
   const { toast } = useToast();
-  const { currentUser } = useUserStore();
 
-  const handleLogout = async () => {
-    try {
-      await logout();
-      
-      toast({
-        title: "Logged out successfully",
-        description: "You have been logged out of your account",
-      });
-
-      // Redirect to home page
-      router.push("/");
-      
-      // Force page refresh to clear all state
-      window.location.reload();
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to logout. Please try again.",
-      });
-    }
+  const handleLogout = () => {
+    logout();
+    toast({
+      title: "Logged out",
+      description: "You have been successfully logged out",
+    });
+    router.push("/");
   };
 
   if (!currentUser) {
     return <AuthButtons />;
   }
-
-  const accountLink = currentUser.role === 'seller' ? '/dashboard' : '/account';
-  const accountText = currentUser.role === 'seller' ? 'Dashboard' : 'My Account';
 
   return (
     <DropdownMenu>
@@ -73,9 +55,9 @@ export function UserNav() {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <DropdownMenuItem onClick={() => router.push(accountLink)}>
+          <DropdownMenuItem onClick={() => router.push(currentUser.role === 'seller' ? '/dashboard' : '/account')}>
             <Settings className="mr-2 h-4 w-4" />
-            <span>{accountText}</span>
+            <span>{currentUser.role === 'seller' ? 'Dashboard' : 'My Account'}</span>
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />

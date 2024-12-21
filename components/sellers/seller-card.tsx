@@ -5,11 +5,18 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Star, MapPin } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { Skeleton } from "@/components/ui/skeleton";
-import type { Seller } from '@/lib/types/seller';
 
 interface SellerCardProps {
-  seller: Seller;
+  seller: {
+    id: string;
+    name: string;
+    description: string;
+    rating: number;
+    image: string;
+    location: string;
+    province: string;
+    category: string;
+  };
 }
 
 export function SellerCard({ seller }: SellerCardProps) {
@@ -31,12 +38,10 @@ export function SellerCard({ seller }: SellerCardProps) {
             <h3 className="font-semibold">{seller.name}</h3>
             <Badge variant="secondary" className="flex items-center gap-1">
               <Star className="h-3 w-3 fill-current" />
-              {seller.rating.toFixed(1)}
+              {seller.rating}
             </Badge>
           </div>
-          <p className="text-sm text-muted-foreground line-clamp-2">
-            {seller.description}
-          </p>
+          <p className="text-sm text-muted-foreground">{seller.description}</p>
           <div className="flex items-center gap-1 mt-2 text-sm text-muted-foreground">
             <MapPin className="h-4 w-4" />
             {seller.location}, {seller.province}
@@ -46,7 +51,7 @@ export function SellerCard({ seller }: SellerCardProps) {
           className="w-full"
           onClick={() => router.push(`/sellers/${seller.id}`)}
         >
-          Lihat Produk
+          View Products
         </Button>
       </CardContent>
     </Card>
