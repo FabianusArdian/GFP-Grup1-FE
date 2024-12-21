@@ -1,34 +1,55 @@
-import { create } from "zustand";
-import { persist } from "zustand/middleware";
-import type { User } from "@/lib/types/user";
-import type { AuthResponse } from "@/lib/types/auth";
+import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
+import { User, UserStore } from '@/lib/types/user';
+import { generateId } from '@/lib/utils/id';
+import { initialUsers } from '@/lib/data/server/users';
 
-interface UserState {
-  currentUser: User | null;
-  setUser: (user: User) => void;
-  clearUser: () => void;
-  handleAuthResponse: (response: AuthResponse) => void;
-}
-
-export const useUserStore = create<UserState>()(
+export const useUserStore = create<UserStore>()(
   persist(
-    (set) => ({
+    (set, get) => ({
+      users: initialUsers,
       currentUser: null,
 
-      setUser: (user) => set({ currentUser: user }),
+      addUser: (userData) => {
+        const newUser: User = {
+          id: generateId(),
+          ...userData,
+          createdAt: new Date(),
+        };
 
-      clearUser: () => set({ currentUser: null }),
+        set((state) => ({
+          users: [...state.users, newUser],
+          currentUser: newUser,
+        }));
 
-      handleAuthResponse: (response) => {
-        // Save token
-        localStorage.setItem("auth_token", response.token);
+        return newUser;
+      },
 
-        // Update user state
-        set({ currentUser: response.user });
+      getUserByEmail: (email) => {
+        return get().users.find((user) => user.email === email);
+      },
+
+      updateUser: (id, data) => {
+        set((state) => ({
+          users: state.users.map((user) =>
+            user.id === id ? { ...user, ...data } : user
+          ),
+          currentUser:
+            state.currentUser?.id === id
+              ? { ...state.currentUser, ...data }
+              : state.currentUser,
+        }));
+      },
+
+      deleteUser: (id) => {
+        set((state) => ({
+          users: state.users.filter((user) => user.id !== id),
+          currentUser: state.currentUser?.id === id ? null : state.currentUser,
+        }));
       },
     }),
     {
-      name: "user-storage",
+      name: 'user-storage',
     }
   )
 );

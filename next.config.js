@@ -1,14 +1,10 @@
-
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'standalone', // Change from 'export' to 'standalone'
+  output: 'export',
   eslint: {
     ignoreDuringBuilds: true,
   },
-  images: { 
-    domains: ['images.unsplash.com'], // Add image domains
-    unoptimized: true 
-  },
+  images: { unoptimized: true },
 };
 
 module.exports = nextConfig;

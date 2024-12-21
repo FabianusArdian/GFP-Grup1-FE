@@ -14,13 +14,3 @@ export interface RegisterFormData extends AuthFormData {
 export interface LoginFormData extends AuthFormData {
   role: UserRole;
 }
-
-export interface AuthResponse {
-  token: string;
-  user: {
-    id: string;
-    name: string;
-    email: string;
-    role: UserRole;
-  };
-}

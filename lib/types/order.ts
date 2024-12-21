@@ -1,28 +1,28 @@
-export type OrderStatus = 
-  | 'pending'
-  | 'processing'
-  | 'shipped'
-  | 'delivered'
-  | 'cancelled';
+export type OrderStatus = 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
 
-export interface OrderItem {
+export interface StatusHistoryEntry {
   id: string;
-  productId: string;
-  quantity: number;
-  price: number;
-  name: string;
-  image: string;
+  status: OrderStatus;
+  timestamp: Date;
+  note?: string;
+  updatedBy: string;
 }
 
 export interface Order {
   id: string;
-  userId: string;
+  customerName: string;
+  customerEmail: string;
+  date: Date;
+  total: number;
   status: OrderStatus;
-  totalAmount: number;
-  createdAt: string;
-  items: OrderItem[];
-  shippingAddress: {
+  statusHistory: StatusHistoryEntry[];
+  items: Array<{
     id: string;
+    name: string;
+    quantity: number;
+    price: number;
+  }>;
+  shippingAddress: {
     name: string;
     phone: string;
     address: string;
@@ -31,12 +31,4 @@ export interface Order {
     postalCode: string;
   };
   paymentMethod: string;
-}
-
-export interface OrderStatusHistory {
-  id: string;
-  status: OrderStatus;
-  timestamp: string;
-  note?: string;
-  updatedBy: string;
 }
